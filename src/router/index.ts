@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
 // Import views
-import Login from '@/views/Login.vue'
-import Register from '@/views/Register.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
 import MessageBoard from '@/views/MessageBoard.vue'
 
 const router = createRouter({
@@ -11,13 +11,13 @@ const router = createRouter({
   routes: [
     {
       path: '/login',
-      name: 'Login',
-      component: Login,
+      name: 'LoginView',
+      component: LoginView,
     },
     {
       path: '/register',
-      name: 'Register',
-      component: Register,
+      name: 'RegisterView',
+      component: RegisterView,
     },
     {
       path: '/',
@@ -42,7 +42,7 @@ router.beforeEach((to, from, next) => {
     // If the route requires auth and the user is not authenticated,
     // redirect to the login page.
     next('/login')
-  } else if ((to.name === 'Login' || to.name === 'Register') && isAuthenticated) {
+  } else if ((to.name === 'LoginView' || to.name === 'RegisterView') && isAuthenticated) {
     // If the user is authenticated, they should not access login/register pages.
     // Redirect them to the main message board.
     next('/')

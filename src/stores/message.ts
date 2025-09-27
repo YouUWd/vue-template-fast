@@ -25,17 +25,17 @@ export const useMessageStore = defineStore('message', () => {
 
   async function postMessage(content: string) {
     const userStore = useUserStore()
-    if (!userStore.user) {
+    if (!userStore.isAuthenticated) {
       throw new Error('User must be logged in to post a message.')
     }
 
     isLoading.value = true
     error.value = null
     try {
-      // The API call will add the message to the mock data.
-      // We then refetch all messages to get the updated list.
-      await api.postMessage(content, userStore.user.username, userStore.user.id)
-      await fetchMessages() // Refetch to ensure list is sorted and up-to-date
+      // The backend will create the message and return the created object.
+      // We add it to the top of our local list for an immediate UI update.
+      const newMessage = await api.postMessage(content)
+      messages.value.unshift(newMessage) // Add to the beginning of the array
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
     } finally {
@@ -45,20 +45,23 @@ export const useMessageStore = defineStore('message', () => {
 
   async function deleteMessage(messageId: number) {
     const userStore = useUserStore()
-    if (!userStore.user) {
+    if (!userStore.isAuthenticated) {
       throw new Error('User must be logged in to delete a message.')
     }
+
+    const originalMessages = [...messages.value]
+    // Optimistic update: remove the message from the UI immediately.
+    messages.value = messages.value.filter((m) => m.id !== messageId)
 
     isLoading.value = true
     error.value = null
     try {
-      await api.deleteMessage(messageId, userStore.user.id)
-      // Remove the message from the local state directly for a faster UI update
-      messages.value = messages.value.filter((m) => m.id !== messageId)
+      // The backend will handle authorization.
+      await api.deleteMessage(messageId)
     } catch (e) {
+      // If the API call fails, revert the change and show an error.
+      messages.value = originalMessages
       error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
-      // If the API call fails, we might want to refetch to get the true state
-      await fetchMessages()
     } finally {
       isLoading.value = false
     }
