@@ -6,9 +6,20 @@ import router from './router'
 // Import the new global stylesheet
 import './assets/main.css'
 
-const app = createApp(App)
+async function enableMocking() {
+  if (import.meta.env.DEV) {
+    const { worker } = await import('./mocks/browser')
+    // `worker.start()` returns a Promise that resolves
+    // with a Service Worker registration instance.
+    return worker.start()
+  }
+}
 
-app.use(createPinia())
-app.use(router)
+enableMocking().then(() => {
+  const app = createApp(App)
 
-app.mount('#app')
+  app.use(createPinia())
+  app.use(router)
+
+  app.mount('#app')
+})
