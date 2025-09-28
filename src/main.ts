@@ -1,14 +1,14 @@
 import { createApp } from 'vue'
-import pinia from './store' // Import the centralized Pinia instance
+import pinia from './store'
 import App from './App.vue'
 import router from './router'
 
-// Remove the old CSS import, assuming styles are handled by Tailwind or a new global style entry point
-// import './assets/main.css'
+// Import the new global stylesheet
+import './assets/styles/index.css'
 
 const app = createApp(App)
 
-app.use(pinia) // Use the imported Pinia instance
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')

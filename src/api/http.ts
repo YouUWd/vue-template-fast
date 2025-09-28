@@ -1,46 +1,59 @@
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { useUserStore } from '@/store/modules/user'
+import type { ApiResponse } from '@/types/api'
 
 // In a real application, this would be in a .env file
 const API_BASE_URL = 'https://your-api-url.com/api' // Replace with your actual API endpoint
 
+// Create an axios instance with a base configuration
+const service = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 5000, // Request timeout
+})
+
+// Request interceptor
+service.interceptors.request.use(
+  (config) => {
+    const userStore = useUserStore()
+    if (userStore.token) {
+      config.headers.Authorization = `Bearer ${userStore.token}`
+    }
+    return config
+  },
+  (error) => {
+    console.error('Request Error:', error)
+    return Promise.reject(error)
+  },
+)
+
+// Response interceptor
+service.interceptors.response.use(
+  (response: AxiosResponse<ApiResponse<any>>) => {
+    const res = response.data
+    if (res.code !== 200) {
+      // Handle business errors
+      return Promise.reject(new Error(res.msg || 'Error'))
+    }
+    // If successful, we replace the original response.data with the actual business data (res.body)
+    // This way, the caller of the request function will receive the unwrapped data.
+    response.data = res.body
+    return response
+  },
+  (error) => {
+    console.error('Response Error:', error)
+    return Promise.reject(error)
+  },
+)
+
 /**
- * A helper function for making API requests.
- * It automatically handles JSON parsing, error handling, and adding the auth token.
- * @param endpoint - The API endpoint to call (e.g., '/login').
- * @param options - The options for the fetch call (method, body, etc.).
+ * A generic request function that uses the configured axios instance.
+ * It automatically extracts the `data` from the axios response.
+ * @template T - The type of the business data we expect.
+ * @param {AxiosRequestConfig} config - The axios request config.
+ * @returns {Promise<T>} A promise that resolves to the business data.
  */
-export async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  // The store is imported dynamically within the function to avoid circular dependencies
-  // at the module level, since API modules will be used by stores.
-  const userStore = useUserStore()
-  const token = userStore.token
-
-  // Set default headers
-  const headers = new Headers({
-    'Content-Type': 'application/json',
-    ...options.headers,
-  })
-
-  // Add authorization token if it exists
-  if (token) {
-    headers.append('Authorization', `Bearer ${token}`)
-  }
-
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  })
-
-  if (!response.ok) {
-    // Try to parse error message from the response body
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-  }
-
-  // If the response has no content, return an empty object or handle as needed
-  if (response.status === 204) {
-    return {} as T
-  }
-
-  return response.json()
+const request = <T>(config: AxiosRequestConfig): Promise<T> => {
+  return service(config).then((response: AxiosResponse<T>) => response.data)
 }
+
+export default request
