@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useMessageStore } from '@/stores/message';
-import { useUserStore } from '@/stores/user';
+import { useMessageStore } from '@/store/modules/message';
+import { useUserStore } from '@/store/modules/user';
 import { storeToRefs } from 'pinia';
-import MessageForm from '@/components/MessageForm.vue';
-import MessageItem from '@/components/MessageItem.vue';
+import MessageForm from '@/components/business/MessageForm.vue';
+import MessageItem from '@/components/business/MessageItem.vue';
 
 const messageStore = useMessageStore();
 const userStore = useUserStore();

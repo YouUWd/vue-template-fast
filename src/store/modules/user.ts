@@ -1,7 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import type { User, LoginResponse } from '@/types'
-import * as api from '@/utils/request'
+import type { User } from '@/types'
+import type { LoginResponse } from '@/types/api'
+import * as api from '@/api'
 
 // Helper to get initial state from localStorage
 const getInitialUser = (): User | null => {

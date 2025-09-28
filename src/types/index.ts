@@ -11,8 +11,3 @@ export interface Message {
   time: string
   userId: number
 }
-
-export interface LoginResponse {
-  token: string
-  user: Omit<User, 'password'>
-}

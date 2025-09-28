@@ -1,28 +1,28 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/store/modules/user'
 
-// Import views
-import LoginView from '@/views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import MessageBoard from '@/views/MessageBoard.vue'
+// Import pages from the new 'pages' directory
+import LoginPage from '@/pages/Login/index.vue'
+import RegisterPage from '@/pages/Register/index.vue'
+import MessageBoardPage from '@/pages/MessageBoard/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',
-      name: 'LoginView',
-      component: LoginView,
+      name: 'LoginView', // The name can remain for logic purposes
+      component: LoginPage,
     },
     {
       path: '/register',
-      name: 'RegisterView',
-      component: RegisterView,
+      name: 'RegisterView', // The name can remain for logic purposes
+      component: RegisterPage,
     },
     {
       path: '/',
       name: 'MessageBoard',
-      component: MessageBoard,
+      component: MessageBoardPage,
       meta: { requiresAuth: true }, // This route requires authentication
     },
     // Redirect to login if route not found

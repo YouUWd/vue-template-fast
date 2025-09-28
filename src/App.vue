@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { useUserStore } from '@/stores/user';
-import TheHeader from '@/components/TheHeader.vue';
+import { useUserStore } from '@/store/modules/user';
+import TheHeader from '@/components/business/TheHeader.vue';
 
 const userStore = useUserStore();
 const { isAuthenticated } = storeToRefs(userStore);

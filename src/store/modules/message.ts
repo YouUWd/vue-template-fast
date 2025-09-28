@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Message } from '@/types'
-import * as api from '@/utils/request'
+import * as api from '@/api'
 import { useUserStore } from './user'
 
 export const useMessageStore = defineStore('message', () => {
