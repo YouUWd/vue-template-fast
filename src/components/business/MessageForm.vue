@@ -2,24 +2,20 @@
 import { ref } from 'vue'
 
 const emit = defineEmits<{
-  (e: 'postMessage', content: string): void
+  (e: 'createMessage', content: string): void
 }>()
 
 const newMessageContent = ref('')
 const isLoading = ref(false)
 
-const handlePostMessage = async () => {
+const handleCreateMessage = async () => {
   if (newMessageContent.value.trim() === '') return
 
   isLoading.value = true
   try {
-    // Emit the event for the parent component to handle the API call
-    emit('postMessage', newMessageContent.value)
-    // Clear the input field after successful post
+    emit('createMessage', newMessageContent.value)
     newMessageContent.value = ''
   } finally {
-    // The parent will control the overall loading state,
-    // but we can manage a local loading for the button.
     isLoading.value = false
   }
 }
@@ -28,7 +24,7 @@ const handlePostMessage = async () => {
 <template>
   <div class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 mb-8">
     <h3 class="text-xl font-semibold text-gray-800 mb-4">Post a new message</h3>
-    <form @submit.prevent="handlePostMessage" class="space-y-4">
+    <form @submit.prevent="handleCreateMessage" class="space-y-4">
       <textarea
         v-model="newMessageContent"
         placeholder="What's on your mind?"

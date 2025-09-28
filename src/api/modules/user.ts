@@ -10,6 +10,13 @@ export const login = (credentials: Omit<User, 'id'>): Promise<LoginResponse> => 
   })
 }
 
+export const fetchUserProfile = (): Promise<User> => {
+  return request<User>({
+    url: '/auth/profile', // Assuming this endpoint returns the user profile
+    method: 'get',
+  })
+}
+
 export const register = (credentials: Omit<User, 'id'>): Promise<void> => {
   return request<void>({
     url: '/register',

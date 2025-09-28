@@ -1,69 +1,75 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { Message } from '@/types'
 import * as api from '@/api'
-import { useUserStore } from './user'
+import type { Message } from '@/types'
 
 export const useMessageStore = defineStore('message', () => {
   // State
   const messages = ref<Message[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  const total = ref(0)
+  const currentPage = ref(1)
+  const limit = ref(10)
 
   // Actions
-  async function fetchMessages() {
-    isLoading.value = true
-    error.value = null
+  const setLoading = (loadingState: boolean) => {
+    isLoading.value = loadingState
+  }
+
+  const setError = (newError: string | null) => {
+    error.value = newError
+  }
+
+  async function fetchMessages(page = 1) {
+    setLoading(true)
+    setError(null)
     try {
-      messages.value = await api.fetchMessages()
+      // This assumes the API will eventually support pagination.
+      // For now, we fetch all messages and handle pagination client-side if needed,
+      // or prepare for a future API that returns a paginated response.
+      const response = await api.fetchMessages() // Assuming it returns Message[] for now
+      messages.value = response
+      total.value = response.length
+      currentPage.value = page
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
+      const errorMessage = e instanceof Error ? e.message : 'Failed to fetch messages'
+      setError(errorMessage)
     } finally {
-      isLoading.value = false
+      setLoading(false)
     }
   }
 
-  async function postMessage(content: string) {
-    const userStore = useUserStore()
-    if (!userStore.isAuthenticated) {
-      throw new Error('User must be logged in to post a message.')
-    }
-
-    isLoading.value = true
-    error.value = null
+  async function createMessage(content: string) {
+    setLoading(true)
+    setError(null)
     try {
-      // The backend will create the message and return the created object.
-      // We add it to the top of our local list for an immediate UI update.
       const newMessage = await api.postMessage(content)
-      messages.value.unshift(newMessage) // Add to the beginning of the array
+      messages.value.unshift(newMessage)
+      total.value += 1
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
+      const errorMessage = e instanceof Error ? e.message : 'Failed to post message'
+      setError(errorMessage)
+      throw new Error(errorMessage) // Re-throw to be caught in the component
     } finally {
-      isLoading.value = false
+      setLoading(false)
     }
   }
 
-  async function deleteMessage(messageId: number) {
-    const userStore = useUserStore()
-    if (!userStore.isAuthenticated) {
-      throw new Error('User must be logged in to delete a message.')
-    }
-
+  async function deleteMessage(id: number) {
     const originalMessages = [...messages.value]
-    // Optimistic update: remove the message from the UI immediately.
-    messages.value = messages.value.filter((m) => m.id !== messageId)
+    messages.value = messages.value.filter((msg) => msg.id !== id)
+    total.value -= 1
 
-    isLoading.value = true
-    error.value = null
+    setError(null)
     try {
-      // The backend will handle authorization.
-      await api.deleteMessage(messageId)
+      await api.deleteMessage(id)
     } catch (e) {
-      // If the API call fails, revert the change and show an error.
+      // Revert if the API call fails
       messages.value = originalMessages
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
-    } finally {
-      isLoading.value = false
+      total.value += 1
+      const errorMessage = e instanceof Error ? e.message : 'Failed to delete message'
+      setError(errorMessage)
     }
   }
 
@@ -71,8 +77,11 @@ export const useMessageStore = defineStore('message', () => {
     messages,
     isLoading,
     error,
+    total,
+    currentPage,
+    limit,
     fetchMessages,
-    postMessage,
+    createMessage,
     deleteMessage,
   }
 })
