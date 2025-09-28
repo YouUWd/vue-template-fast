@@ -28,32 +28,37 @@ service.interceptors.request.use(
 
 // Response interceptor
 service.interceptors.response.use(
-  (response: AxiosResponse<ApiResponse<any>>) => {
+  // The success handler: check for business error code, otherwise pass the response through.
+  (response: AxiosResponse<ApiResponse<unknown>>) => {
     const res = response.data
     if (res.code !== 200) {
-      // Handle business errors
+      console.error('API Error:', res.msg)
       return Promise.reject(new Error(res.msg || 'Error'))
     }
-    // If successful, we replace the original response.data with the actual business data (res.body)
-    // This way, the caller of the request function will receive the unwrapped data.
-    response.data = res.body
-    return response
+    return response // Pass the original response if successful
   },
+  // The error handler for network errors etc.
   (error) => {
-    console.error('Response Error:', error)
+    console.error('Network Error:', error)
     return Promise.reject(error)
   },
 )
 
 /**
  * A generic request function that uses the configured axios instance.
- * It automatically extracts the `data` from the axios response.
- * @template T - The type of the business data we expect.
+ * It calls the service and then unwraps the response to return only the business data.
+ * @template T - The type of the business data (`body`) we expect.
  * @param {AxiosRequestConfig} config - The axios request config.
- * @returns {Promise<T>} A promise that resolves to the business data.
+ * @returns {Promise<T>} A promise that resolves to the business data (`body`).
  */
 const request = <T>(config: AxiosRequestConfig): Promise<T> => {
-  return service(config).then((response: AxiosResponse<T>) => response.data)
+  // The type for the service response will be AxiosResponse<ApiResponse<T>>
+  // We need to cast the response to the correct type after the interceptor.
+  return service(config).then((response: AxiosResponse<ApiResponse<T>>) => {
+    // After the interceptor passes, we are sure the response is successful.
+    // We can now safely extract and return the `body`.
+    return response.data.body
+  })
 }
 
 export default request
