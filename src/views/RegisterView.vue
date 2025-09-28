@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUserStore } from '@/store/modules/user';
+import { useAuthStore } from '@/stores/auth'; // Adjust the import path as necessary
 
 const username = ref('');
 const password = ref('');
 const error = ref<string | null>(null);
 const successMessage = ref<string | null>(null);
 const router = useRouter();
-const userStore = useUserStore();
+const userStore = useAuthStore();
 
 const handleRegister = async () => {
   error.value = null;

@@ -1,14 +1,14 @@
 import { createApp } from 'vue'
-import pinia from './store'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
 // Import the new global stylesheet
-import './assets/styles/index.css'
+import './assets/main.css'
 
 const app = createApp(App)
 
-app.use(pinia)
+app.use(createPinia())
 app.use(router)
 
 app.mount('#app')

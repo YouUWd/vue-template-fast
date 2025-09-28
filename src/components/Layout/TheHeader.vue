@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/store/modules/user'
+import { useAuthStore } from '@/stores/auth'
 import { storeToRefs } from 'pinia'
 
-const userStore = useUserStore()
+const userStore = useAuthStore()
 const router = useRouter()
-const { isAuthenticated, username } = storeToRefs(userStore)
+const { isAuthenticated, user } = storeToRefs(userStore)
 
 const handleLogout = () => {
   userStore.logout()
@@ -20,11 +20,9 @@ const handleLogout = () => {
         <router-link to="/">Message Board</router-link>
       </h1>
       <div v-if="isAuthenticated" class="flex items-center space-x-4">
-        <span class="text-gray-700">Welcome, {{ username }}</span>
-        <button
-          @click="handleLogout"
-          class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-red-600 transition"
-        >
+        <span class="text-gray-700">Welcome, {{ user?.username }}</span>
+        <button @click="handleLogout"
+          class="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-red-600 transition">
           Logout
         </button>
       </div>

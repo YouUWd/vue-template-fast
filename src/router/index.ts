@@ -1,53 +1,39 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/store/modules/user'
-
-// Import pages from the new 'pages' directory
-import LoginPage from '@/pages/Login/index.vue'
-import RegisterPage from '@/pages/Register/index.vue'
-import MessageBoardPage from '@/pages/MessageBoard/index.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/login',
-      name: 'LoginView', // The name can remain for logic purposes
-      component: LoginPage,
+      name: 'login',
+      component: () => import('@/views/LoginView.vue'),
+      meta: { requiresGuest: true },
     },
     {
       path: '/register',
-      name: 'RegisterView', // The name can remain for logic purposes
-      component: RegisterPage,
+      name: 'register',
+      component: () => import('@/views/RegisterView.vue'),
+      meta: { requiresGuest: true },
     },
     {
       path: '/',
-      name: 'MessageBoard',
-      component: MessageBoardPage,
-      meta: { requiresAuth: true }, // This route requires authentication
-    },
-    // Redirect to login if route not found
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/login',
+      name: 'messages',
+      component: () => import('@/views/MessageBoardView.vue'),
+      meta: { requiresAuth: true },
     },
   ],
 })
 
-// Global navigation guard
+// 路由守卫
 router.beforeEach((to, from, next) => {
-  const userStore = useUserStore()
-  const isAuthenticated = userStore.isAuthenticated
-
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    // If the route requires auth and the user is not authenticated,
-    // redirect to the login page.
+  const authStore = useAuthStore()
+  authStore.initAuth()
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } else if ((to.name === 'LoginView' || to.name === 'RegisterView') && isAuthenticated) {
-    // If the user is authenticated, they should not access login/register pages.
-    // Redirect them to the main message board.
+  } else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next('/')
   } else {
-    // Otherwise, allow the navigation.
     next()
   }
 })
