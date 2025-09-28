@@ -2,12 +2,13 @@ import { http, HttpResponse } from 'msw'
 import type { LoginForm, RegisterForm } from '@/types/auth'
 import type { CreateMessageForm } from '@/types/message'
 
+const VITE_API_BASE_URL = 'http://localhost:3000/api'
 const secret = 'your-secret-key'
 const users: Record<string, string> = {}
 
 export const handlers = [
   // 登录
-  http.post<never, LoginForm>('/auth/login', async ({ request }) => {
+  http.post<never, LoginForm>(`${VITE_API_BASE_URL}/auth/login`, async ({ request }) => {
     const { username, password } = await request.json()
     if (users[username] === password) {
       return HttpResponse.json({
@@ -20,7 +21,7 @@ export const handlers = [
   }),
 
   // 注册
-  http.post<never, RegisterForm>('/auth/register', async ({ request }) => {
+  http.post<never, RegisterForm>(`${VITE_API_BASE_URL}/auth/register`, async ({ request }) => {
     const { username, password } = await request.json()
     if (users[username]) {
       return new HttpResponse(null, { status: 409 })
@@ -34,7 +35,7 @@ export const handlers = [
   }),
 
   // 获取用户信息
-  http.get('/auth/profile', ({ request }) => {
+  http.get(`${VITE_API_BASE_URL}/auth/profile`, ({ request }) => {
     const token = request.headers.get('Authorization')?.split(' ')[1]
     if (token) {
       const [key, username] = token.split('&')
@@ -50,7 +51,7 @@ export const handlers = [
   }),
 
   // 刷新token
-  http.post('/auth/refresh', ({ request }) => {
+  http.post(`${VITE_API_BASE_URL}/auth/refresh`, ({ request }) => {
     const token = request.headers.get('Authorization')?.split(' ')[1]
     if (token) {
       const [key, username] = token.split('&')
@@ -62,7 +63,7 @@ export const handlers = [
   }),
 
   // 获取留言列表
-  http.get('/messages', () => {
+  http.get(`${VITE_API_BASE_URL}/messages`, () => {
     return HttpResponse.json({
       data: [
         { id: 1, content: 'Hello, world!', author: 'user1', createdAt: new Date() },
@@ -73,7 +74,7 @@ export const handlers = [
   }),
 
   // 创建留言
-  http.post<never, CreateMessageForm>('/messages', async ({ request }) => {
+  http.post<never, CreateMessageForm>(`${VITE_API_BASE_URL}/messages`, async ({ request }) => {
     const { content } = await request.json()
     return HttpResponse.json({
       id: Math.random(),
@@ -84,7 +85,7 @@ export const handlers = [
   }),
 
   // 删除留言
-  http.delete('/messages/:id', () => {
+  http.delete(`${VITE_API_BASE_URL}/messages/:id`, () => {
     return new HttpResponse(null, { status: 204 })
   }),
 ]
