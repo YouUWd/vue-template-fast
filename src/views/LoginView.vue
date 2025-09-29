@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-const username = ref('');
-const password = ref('');
-const error = ref<string | null>(null);
-const router = useRouter();
-const userStore = useAuthStore();
+const username = ref('')
+const password = ref('')
+const error = ref<string | null>(null)
+const router = useRouter()
+const userStore = useAuthStore()
 
 const handleLogin = async () => {
-  error.value = null;
+  error.value = null
   try {
-    await userStore.login({ username: username.value, password: password.value });
-    router.push('/');
+    await userStore.login({ username: username.value, password: password.value })
+    router.push('/')
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'An unknown error occurred.';
+    error.value = e instanceof Error ? e.message : 'An unknown error occurred.'
   }
-};
+}
 </script>
 
 <template>
@@ -30,26 +30,45 @@ const handleLogin = async () => {
       <form @submit.prevent="handleLogin" class="space-y-4">
         <!-- 用户名 -->
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
-          <input id="username" v-model="username" type="text" required
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1"
+            >Username</label
+          >
+          <input
+            id="username"
+            v-model="username"
+            type="text"
+            required
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <!-- 密码 -->
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-          <input id="password" v-model="password" type="password" required
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1"
+            >Password</label
+          >
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            required
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <!-- 错误提示 -->
-        <p v-if="error" class="text-red-500 bg-red-100 border border-red-300 rounded-md px-3 py-2 text-sm">
+        <p
+          v-if="error"
+          class="text-red-500 bg-red-100 border border-red-300 rounded-md px-3 py-2 text-sm"
+        >
           {{ error }}
         </p>
 
         <!-- 登录按钮 -->
-        <button type="submit"
-          class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition">
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white font-medium py-2 rounded-lg hover:bg-blue-700 transition"
+        >
           Login
         </button>
       </form>

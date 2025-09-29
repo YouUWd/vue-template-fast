@@ -138,6 +138,7 @@ npm create vue@latest
 
 > 下面是以一个简单的留言板系统为例，进行系统完整开发。
 
+```shell
 vue-template-fast/
 ├── public/
 │ └── mockServiceWorker.js # MSW service worker (自动生成)
@@ -181,3 +182,5 @@ vue-template-fast/
 ├── .env.production # 生产环境变量
 ├── vite.config.ts # Vite 配置
 └── package.json
+```
+

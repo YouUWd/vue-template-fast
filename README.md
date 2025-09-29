@@ -26,6 +26,12 @@ npm install
 npm run dev
 ```
 
+### Run with mock api
+
+```sh
+npm run dev:mock
+```
+
 ### Type-Check, Compile and Minify for Production
 
 ```sh
@@ -36,4 +42,10 @@ npm run build
 
 ```sh
 npm run lint
+```
+
+### Code formate
+
+```sh
+npm run format
 ```

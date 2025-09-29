@@ -22,12 +22,15 @@ const handleDelete = (messageId: number) => {
     <div class="flex-1">
       <p class="text-gray-800">{{ message.content }}</p>
       <small class="text-gray-500">
-        by <span class="font-medium text-gray-700">{{ message.authorName }}</span>
-        · {{ new Date(message.createdAt).toLocaleString() }}
+        by <span class="font-medium text-gray-700">{{ message.authorName }}</span> ·
+        {{ new Date(message.createdAt).toLocaleString() }}
       </small>
     </div>
-    <button v-if="currentUserId && currentUserId === message.authorId" @click="handleDelete(message.id)"
-      class="ml-4 text-sm text-red-500 hover:text-red-700">
+    <button
+      v-if="currentUserId && currentUserId === message.authorId"
+      @click="handleDelete(message.id)"
+      class="ml-4 text-sm text-red-500 hover:text-red-700"
+    >
       Delete
     </button>
   </li>

@@ -6,20 +6,20 @@ import router from './router'
 // Import the new global stylesheet
 import './assets/main.css'
 
-async function enableMocking() {
-  if (import.meta.env.DEV) {
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+
+async function bootstrap() {
+  // 开发环境启用 MSW
+  if (import.meta.env.VITE_USE_MOCK === 'true') {
     const { worker } = await import('./mocks/browser')
-    // `worker.start()` returns a Promise that resolves
-    // with a Service Worker registration instance.
-    return worker.start()
+    await worker.start({
+      onUnhandledRequest: 'bypass', // 未处理的请求交给浏览器
+    })
   }
-}
-
-enableMocking().then(() => {
-  const app = createApp(App)
-
-  app.use(createPinia())
-  app.use(router)
 
   app.mount('#app')
-})
+}
+bootstrap()

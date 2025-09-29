@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { useMessageStore } from '@/stores/message';
-import { useAuthStore } from '@/stores/auth';
-import { storeToRefs } from 'pinia';
-import MessageForm from '@/components/Layout/MessageForm.vue';
-import MessageItem from '@/components/Layout/MessageItem.vue';
+import { onMounted } from 'vue'
+import { useMessageStore } from '@/stores/message'
+import { useAuthStore } from '@/stores/auth'
+import { storeToRefs } from 'pinia'
+import MessageForm from '@/components/Layout/MessageForm.vue'
+import MessageItem from '@/components/Layout/MessageItem.vue'
 
-const messageStore = useMessageStore();
-const userStore = useAuthStore();
+const messageStore = useMessageStore()
+const userStore = useAuthStore()
 
-const { loading, messages } = storeToRefs(messageStore);
-const { user } = storeToRefs(userStore);
+const { loading, messages } = storeToRefs(messageStore)
+const { user } = storeToRefs(userStore)
 
 onMounted(() => {
-  messageStore.fetchMessages();
-});
+  messageStore.fetchMessages()
+})
 
 const handlePostMessage = async (content: string) => {
-  await messageStore.createMessage({ content });
-};
+  await messageStore.createMessage({ content })
+}
 
 const handleDeleteMessage = async (messageId: number) => {
-  await messageStore.deleteMessage(messageId);
-};
+  await messageStore.deleteMessage(messageId)
+}
 </script>
 
 <template>
@@ -39,11 +39,19 @@ const handleDeleteMessage = async (messageId: number) => {
     <MessageForm @postMessage="handlePostMessage" />
 
     <!-- 消息列表 -->
-    <div v-if="!loading && messages.length" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6">
+    <div
+      v-if="!loading && messages.length"
+      class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6"
+    >
       <h3 class="text-xl font-semibold text-gray-800 mb-4">Messages</h3>
       <ul v-if="user" class="space-y-4">
-        <MessageItem v-for="message in messages" :key="message.id" :message="message" :current-user-id="user.id"
-          @delete-message="handleDeleteMessage" />
+        <MessageItem
+          v-for="message in messages"
+          :key="message.id"
+          :message="message"
+          :current-user-id="user.id"
+          @delete-message="handleDeleteMessage"
+        />
       </ul>
     </div>
 
